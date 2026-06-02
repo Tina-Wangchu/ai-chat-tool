@@ -192,7 +192,7 @@ def check_message_count():
         print(f"\n🔔 对话较多（当前 {current_groups} 组），建议清理以保持流畅！")
 
 def chat_with_ai(user_message):
-    """调用 AI 模型获取回复"""
+    """调用 AI 模型获取回复（流式输出）"""
     # 将用户消息添加到历史
     messages.append({
         "role": "user",
@@ -200,22 +200,40 @@ def chat_with_ai(user_message):
     })
 
     try:
-        # 调用模型
+        # 调用模型（启用流式输出）
         completion = client.chat.completions.create(
             model="qwen3.6-plus",
-            messages=messages
+            messages=messages,
+            stream=True,  # 启用流式输出
+            extra_body={
+                "enable_passage_insertion": False,  # 禁用段落插入以减少缓冲
+                "incremental_output": True  # 启用增量输出
+            }
         )
 
-        # 获取 AI 回复
-        ai_response = completion.choices[0].message.content
+        # 用于收集完整的回复内容
+        full_response = ""
 
-        # 将 AI 回复添加到历史
+        # 实时打印流式响应
+        print("🤖 AI: ", end="", flush=True)  # 不换行，实时刷新缓冲区 实时显示
+
+        # 迭代处理每个响应块
+        for chunk in completion:
+            # 提取当前块的内容
+            if chunk.choices and chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                print(content, end="", flush=True)  # 实时打印，不换行
+                full_response += content  # 收集完整内容用于加入到对话记录
+
+        print()  # 打印完成后换行
+
+        # 将完整的 AI 回复添加到历史
         messages.append({
             "role": "assistant",
-            "content": ai_response
+            "content": full_response
         })
 
-        return ai_response
+        return full_response
 
     except Exception as e:
         return f"❌ 调用出错: {str(e)}"
@@ -258,9 +276,8 @@ while True:
         print("⚠️  请输入内容，或输入 /quit 退出")
         continue
 
-    # 调用 AI 并显示回复
+    # 调用 AI（流式输出在函数内部处理）
     ai_response = chat_with_ai(user_input)
-    print(f"\n🤖 AI: {ai_response}")
 
     # 显示当前对话轮数
     print(f"📊 当前对话历史: {len(messages) - 1} 条消息（不含 system）")
