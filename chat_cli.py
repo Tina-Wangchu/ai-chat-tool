@@ -1,5 +1,6 @@
 # Day 4: 多轮对话实现
 # 功能：循环输入、维护对话历史、支持退出和清空
+# 三种不同系统提示词 (小学生、妈妈、AI小助手)
 
 import os
 from openai import OpenAI
@@ -18,13 +19,65 @@ client = OpenAI(
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 
+# 角色配置：定义不同角色的系统提示词
+ROLES = {
+    "1": {
+        "name": "小学生",
+        "content": "你是一个小学生，性格活泼可爱，说话简单直接。你会用孩子的视角看待问题，回答问题时会带上一些童真和好奇心。"
+    },
+    "2": {
+        "name": "妈妈",
+        "content": "你是一位温柔的妈妈，说话亲切温暖，总是关心对方。你会用妈妈的语气和视角来回应，给予关爱和建议。"
+    },
+    "3": {
+        "name": "AI助手",
+        "content": "你是一个友好的AI助手，擅长回答问题并提供帮助。你的回答专业、准确、有礼貌。"
+    }
+}
+
+# 当前选择的系统提示词（用于清空历史时恢复）
+current_system_prompt = ROLES["3"]["content"]  # 默认选择AI助手
+
 # 系统提示词
 messages = [
     {
         "role": "system",
-        "content": "你是一个友好的AI助手，擅长回答问题并提供帮助。"
+        "content": current_system_prompt
     }
 ]
+
+def select_role():
+    """让用户选择角色"""
+    global messages, current_system_prompt
+
+    print("\n" + "=" * 60)
+    print("🎭 请选择对话角色")
+    print("=" * 60)
+    print("  1. 小学生   - 活泼可爱，充满童真")
+    print("  2. 妈妈     - 温柔亲切，充满关爱")
+    print("  3. AI助手   - 专业准确，有礼貌")
+    print("=" * 60)
+
+    while True:
+        choice = input("请输入选项 (1/2/3): ").strip()
+
+        if choice in ["1", "2", "3"]:
+            selected_role = ROLES[choice]
+            current_system_prompt = selected_role["content"]
+
+            # 更新 messages 列表
+            messages = [
+                {
+                    "role": "system",
+                    "content": current_system_prompt
+                }
+            ]
+
+            print(f"\n✅ 已选择角色：{selected_role['name']}")
+            print(f"💡 提示：输入 /role 可以重新选择角色")
+            return
+
+        print("⚠️  无效选项，请输入 1、2 或 3")
 
 # 获得用户输入函数
 def get_user_input():
@@ -35,6 +88,8 @@ def get_user_input():
         return '/quit'
     elif user_input.lower() == '/clear':
         return '/clear'
+    elif user_input.lower() == '/role':
+        return '/role'
     elif user_input.lower() in ['/help', 'help']:
         return '/help'
     elif not user_input:  # 空输入
@@ -52,6 +107,7 @@ def print_help():
     print("📖 命令帮助")
     print("=" * 60)
     print("  /help         - 显示此帮助信息")
+    print("  /role         - 重新选择对话角色")
     print("  /clear        - 清空所有对话历史")
     print("  /clear N      - 保留最近 N 组对话（1组=用户+AI）")
     print("  /clear -N     - 删除最远的 N 组对话")
@@ -73,11 +129,11 @@ def clear_history(command='/clear'):
 
     parts = command.split()
     if len(parts) == 1:
-        # /clear 无参数：清空所有对话
+        # /clear 无参数：清空所有对话，但保留当前选择的系统提示词
         messages = [
             {
                 "role": "system",
-                "content": "你是一个友好的AI助手，擅长回答问题并提供帮助。"
+                "content": current_system_prompt
             }
         ]
         print("✅ 对话历史已清空，可以重新开始对话了")
@@ -169,7 +225,11 @@ def chat_with_ai(user_message):
 print("\n" + "=" * 60)
 print("🤖 AI 聊天助手（多轮对话版）")
 print("=" * 60)
-print("提示：输入 /help 查看命令帮助")
+
+# 首次运行时选择角色
+select_role()
+
+print("\n提示：输入 /help 查看命令帮助")
 print("=" * 60)
 
 # 主循环
@@ -181,6 +241,10 @@ while True:
     if user_input == '/quit':
         print("\n👋 再见！感谢使用！")
         break
+
+    elif user_input == '/role':
+        select_role()
+        continue
 
     elif user_input.startswith('/clear'):
         clear_history(user_input)
