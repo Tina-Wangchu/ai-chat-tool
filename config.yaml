@@ -1,0 +1,58 @@
+api:
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  api_key: "${DASHSCOPE_API_KEY}"
+  model: "qwen3.6-plus"
+
+roles:
+  default: "AI助手"
+
+  available:
+    - id: "1"
+      name: "小学生"
+      description: "活泼可爱，充满童真"
+      system_prompt: |
+        你是一个小学生，性格活泼可爱，说话简单直接。
+        你会用孩子的视角看待问题，回答问题时会带上一些童真和好奇心。
+
+    - id: "2"
+      name: "妈妈"
+      description: "温柔亲切，充满关爱"
+      system_prompt: |
+        你是一位温柔的妈妈，说话亲切温暖，总是关心对方。
+        你会用妈妈的语气和视角来回应，给予关爱和建议。
+
+    - id: "3"
+      name: "AI助手"
+      description: "专业准确，有礼貌"
+      system_prompt: |
+        你是一个友好的AI助手，擅长回答问题并提供帮助。
+        你的回答专业、准确、有礼貌。
+
+model_parameters:
+  temperature: 0.7
+  top_p: 0.9
+  max_tokens: 2000
+
+stream:
+  enabled: true
+  extra_body:
+    enable_passage_insertion: false
+    incremental_output: true
+
+thinking:
+  enabled: false
+  budget: 0
+
+conversation:
+  message_count_warning_threshold: 50
+  auto_select_role_on_start: true
+  history_save_path: "./conversation_history/"
+
+security:
+  enable_content_filter: true
+  filter_level: "medium"
+
+debug:
+  verbose: false
+  log_requests: false
+  log_path: "./logs/"
