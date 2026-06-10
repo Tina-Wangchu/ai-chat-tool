@@ -1,7 +1,7 @@
 api:
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   api_key: "${DASHSCOPE_API_KEY}"
-  model: "qwen3.6-plus"
+  model: "qwen-max"  # ✅ 改进：使用 qwen-max（对 Temperature 支持更好）
 
 roles:
   default: "AI助手"
@@ -30,7 +30,7 @@ roles:
 
 model_parameters:
   temperature: 0.7
-  top_p: 0.9
+  top_p: 1.0  # ✅ 改进：固定 top_p 为最大（与代码中的 top_k=1 配合）
   max_tokens: 2000
 
 stream:

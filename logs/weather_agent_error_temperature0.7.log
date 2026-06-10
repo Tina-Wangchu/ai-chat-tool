@@ -1,0 +1,15 @@
+2026-06-09 13:47:48,493 - ERROR - {
+  "error_type": "AttributeError",
+  "error_message": "'NoneType' object has no attribute 'choices'",
+  "context": {
+    "question": "今天南京的天气如何",
+    "thinking_enabled": false
+  }
+}
+2026-06-09 18:20:05,749 - ERROR - {
+  "error_type": "EmptyResponseError",
+  "error_message": "API 调用返回空响应，请检查网络连接和 API 密钥",
+  "context": {
+    "question": "今天南京的天气如何"
+  }
+}

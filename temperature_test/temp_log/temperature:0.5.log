@@ -1,0 +1,312 @@
+2026-06-10 10:11:31 - temperature:0.5.logger - INFO - ⚙️  系统事件 [batch_test_started]: {"temperature": 0.5, "questions_count": 2, "repeats_per_question": 5, "total_tests": 10}
+2026-06-10 10:11:31 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 1/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+2026-06-10 10:11:31 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:11:31 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 1/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:11:31.719916"}
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1999.24",
+  "timestamp": "2026-06-10T10:11:33.719384"
+}
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:11:33 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(南京)
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：南京
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:11:33 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:11:33.859720"}
+2026-06-10 10:11:42 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:11:42 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:11:42 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:11:42 - temperature:0.5.logger - DEBUG -   - content 长度: 165
+2026-06-10 10:11:42 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:11:42 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "8564.12",
+  "timestamp": "2026-06-10T10:11:42.424574"
+}
+2026-06-10 10:11:42 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 1/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。... | AI=今天南京的天气是多云，气温在20°C到32°C之间波动，风向为西南风，风力等级为1-3级，湿度为43...
+2026-06-10 10:11:42 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 165 字符
+2026-06-10 10:11:43 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 2/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+2026-06-10 10:11:43 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:11:43 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 2/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:11:43.426373"}
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1285.44",
+  "timestamp": "2026-06-10T10:11:44.712075"
+}
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:11:44 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(南京)
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：南京
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:11:44 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:11:44.868331"}
+2026-06-10 10:11:52 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:11:52 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:11:52 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:11:52 - temperature:0.5.logger - DEBUG -   - content 长度: 138
+2026-06-10 10:11:52 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:11:52 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "7246.78",
+  "timestamp": "2026-06-10T10:11:52.115780"
+}
+2026-06-10 10:11:52 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 2/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。... | AI=今天南京的天气是多云，气温在20°C到32°C之间波动，风向为西南风，风力等级为1-3级，湿度为53...
+2026-06-10 10:11:52 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 138 字符
+2026-06-10 10:11:53 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 3/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+2026-06-10 10:11:53 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:11:53 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 3/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:11:53.121832"}
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1166.37",
+  "timestamp": "2026-06-10T10:11:54.288627"
+}
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:11:54 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(南京)
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：南京
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:11:54 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:11:54.428720"}
+2026-06-10 10:12:06 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:12:06 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:12:06 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:12:06 - temperature:0.5.logger - DEBUG -   - content 长度: 200
+2026-06-10 10:12:06 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:12:06 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "12389.30",
+  "timestamp": "2026-06-10T10:12:06.818499"
+}
+2026-06-10 10:12:06 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 3/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。... | AI=今天南京的天气是多云，气温在20°C到32°C之间波动，风向为西南风，风力等级为1-3级，湿度为57...
+2026-06-10 10:12:06 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 200 字符
+2026-06-10 10:12:07 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 4/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+2026-06-10 10:12:07 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:12:07 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 4/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:12:07.821062"}
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "3498.30",
+  "timestamp": "2026-06-10T10:12:11.319869"
+}
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:12:11 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(南京)
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：南京
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:12:11 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:12:11.470825"}
+2026-06-10 10:12:16 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:12:16 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:12:16 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:12:16 - temperature:0.5.logger - DEBUG -   - content 长度: 136
+2026-06-10 10:12:16 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:12:16 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "5475.90",
+  "timestamp": "2026-06-10T10:12:16.947379"
+}
+2026-06-10 10:12:16 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 4/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。... | AI=今天南京的天气是多云，气温在20°C到32°C之间，风向为西南风，风力等级为1-3级，湿度为59%。...
+2026-06-10 10:12:16 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 136 字符
+2026-06-10 10:12:17 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 5/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+2026-06-10 10:12:17 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:12:17 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 5/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:12:17.953156"}
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1808.99",
+  "timestamp": "2026-06-10T10:12:19.762590"
+}
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:12:19 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(南京)
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：南京
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:12:19 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:12:19.882049"}
+2026-06-10 10:12:28 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:12:28 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:12:28 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:12:28 - temperature:0.5.logger - DEBUG -   - content 长度: 163
+2026-06-10 10:12:28 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:12:28 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "8941.86",
+  "timestamp": "2026-06-10T10:12:28.824620"
+}
+2026-06-10 10:12:28 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 5/5] 描述一下南京今天的天气，并谈谈这种天气给人的感觉。... | AI=今天南京的天气是多云，气温在20°C到32°C之间波动，风向为西南风，风力等级为1-3级，湿度为74...
+2026-06-10 10:12:28 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 163 字符
+2026-06-10 10:12:29 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 1/5] 上海今天的天气适合什么样的活动？请给出具体建议。
+2026-06-10 10:12:29 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:12:29 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 1/5] 上海今天的天气适合什么样的活动？请给出具体建议。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:12:29.826997"}
+2026-06-10 10:12:31 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1916.71",
+  "timestamp": "2026-06-10T10:12:31.743991"
+}
+2026-06-10 10:12:31 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:12:31 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(上海)
+2026-06-10 10:12:31 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 上海
+2026-06-10 10:12:31 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:12:32 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:12:32 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：上海
+2026-06-10 10:12:32 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:12:32 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:12:32.164941"}
+2026-06-10 10:12:52 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:12:52 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:12:52 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:12:52 - temperature:0.5.logger - DEBUG -   - content 长度: 363
+2026-06-10 10:12:52 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:12:52 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "19954.96",
+  "timestamp": "2026-06-10T10:12:52.121248"
+}
+2026-06-10 10:12:52 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 1/5] 上海今天的天气适合什么样的活动？请给出具体建议。... | AI=根据高德地图MCP服务器的数据，上海今天的天气是阴天，气温在22°C到31°C之间，风力为南风1-3...
+2026-06-10 10:12:52 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 363 字符
+2026-06-10 10:12:53 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 2/5] 上海今天的天气适合什么样的活动？请给出具体建议。
+2026-06-10 10:12:53 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:12:53 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 2/5] 上海今天的天气适合什么样的活动？请给出具体建议。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:12:53.126878"}
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1592.21",
+  "timestamp": "2026-06-10T10:12:54.719756"
+}
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:12:54 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(上海)
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 上海
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：上海
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:12:54 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:12:54.846035"}
+2026-06-10 10:13:14 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:13:14 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:13:14 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:13:14 - temperature:0.5.logger - DEBUG -   - content 长度: 302
+2026-06-10 10:13:14 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:13:14 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "19241.71",
+  "timestamp": "2026-06-10T10:13:14.088607"
+}
+2026-06-10 10:13:14 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 2/5] 上海今天的天气适合什么样的活动？请给出具体建议。... | AI=根据今天上海的天气情况（阴天，气温22°C ~ 31°C，南风1-3级，湿度63%），可以考虑进行一...
+2026-06-10 10:13:14 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 302 字符
+2026-06-10 10:13:15 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 3/5] 上海今天的天气适合什么样的活动？请给出具体建议。
+2026-06-10 10:13:15 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:13:15 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 3/5] 上海今天的天气适合什么样的活动？请给出具体建议。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:13:15.094720"}
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1617.13",
+  "timestamp": "2026-06-10T10:13:16.712269"
+}
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:13:16 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(上海)
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 上海
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：上海
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:13:16 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:13:16.849767"}
+2026-06-10 10:13:35 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:13:35 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:13:35 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:13:35 - temperature:0.5.logger - DEBUG -   - content 长度: 224
+2026-06-10 10:13:35 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:13:35 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "18375.03",
+  "timestamp": "2026-06-10T10:13:35.225302"
+}
+2026-06-10 10:13:35 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 3/5] 上海今天的天气适合什么样的活动？请给出具体建议。... | AI=根据高德地图提供的天气信息，上海今天的天气为阴天，气温在22°C到31°C之间，风力较小（南风 1-...
+2026-06-10 10:13:35 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 224 字符
+2026-06-10 10:13:36 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 4/5] 上海今天的天气适合什么样的活动？请给出具体建议。
+2026-06-10 10:13:36 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:13:36 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 4/5] 上海今天的天气适合什么样的活动？请给出具体建议。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:13:36.231053"}
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "2167.88",
+  "timestamp": "2026-06-10T10:13:38.399230"
+}
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:13:38 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(上海)
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 上海
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：上海
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:13:38 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:13:38.537535"}
+2026-06-10 10:13:44 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:13:44 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:13:44 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:13:44 - temperature:0.5.logger - DEBUG -   - content 长度: 149
+2026-06-10 10:13:44 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:13:44 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "5774.89",
+  "timestamp": "2026-06-10T10:13:44.313266"
+}
+2026-06-10 10:13:44 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 4/5] 上海今天的天气适合什么样的活动？请给出具体建议。... | AI=根据上海今天的天气情况（阴天，气温22°C ~ 31°C，南风1-3级，湿度43%），可以考虑进行一...
+2026-06-10 10:13:44 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 149 字符
+2026-06-10 10:13:45 - temperature:0.5.logger - INFO - 💬 用户问题: [运行 5/5] 上海今天的天气适合什么样的活动？请给出具体建议。
+2026-06-10 10:13:45 - temperature:0.5.logger - DEBUG - 对话历史长度: 1
+2026-06-10 10:13:45 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 1, "question": "[运行 5/5] 上海今天的天气适合什么样的活动？请给出具体建议。", "model": "qwen-max", "thinking_mode": false, "temperature": 0.5, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-10T10:13:45.314395"}
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1806.26",
+  "timestamp": "2026-06-10T10:13:47.121075"
+}
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 🔧 检测到 1 个工具调用（parallel function calling）
+2026-06-10 10:13:47 - temperature:0.5.logger - DEBUG -   工具 1: amapMaps.weather(上海)
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 🔍 开始查询天气: 上海
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "上海"}
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - ✅ 工具调用 1/1 完成：上海
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 📊 构建了 3 条消息（包含 1 个工具结果）
+2026-06-10 10:13:47 - temperature:0.5.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-10T10:13:47.251943"}
+2026-06-10 10:14:01 - temperature:0.5.logger - DEBUG - 🔍 第二轮响应详情：
+2026-06-10 10:14:01 - temperature:0.5.logger - DEBUG -   - finish_reason: stop
+2026-06-10 10:14:01 - temperature:0.5.logger - DEBUG -   - content 类型: <class 'str'>
+2026-06-10 10:14:01 - temperature:0.5.logger - DEBUG -   - content 长度: 166
+2026-06-10 10:14:01 - temperature:0.5.logger - DEBUG -   - content 为空: False
+2026-06-10 10:14:01 - temperature:0.5.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "14256.78",
+  "timestamp": "2026-06-10T10:14:01.510043"
+}
+2026-06-10 10:14:01 - temperature:0.5.logger - INFO - 💬 对话: User=[运行 5/5] 上海今天的天气适合什么样的活动？请给出具体建议。... | AI=根据高德地图MCP服务器的数据，上海今天的天气是阴天，气温在22°C到31°C之间，南风1-3级，湿...
+2026-06-10 10:14:01 - temperature:0.5.logger - INFO - 📝 AI输出已记录: 166 字符
+2026-06-10 10:14:02 - temperature:0.5.logger - INFO - ⚙️  系统事件 [batch_test_temperature_completed]: {"temperature": 0.5, "questions_tested": 2, "repeats_per_question": 5, "total_runs": 10}

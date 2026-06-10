@@ -1,0 +1,56 @@
+2026-06-09 13:47:48,223 - INFO - Request: {
+  "round": 1,
+  "question": "今天南京的天气如何",
+  "model": "qwen3.6-plus",
+  "thinking_mode": false,
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "amapMaps.weather",
+        "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "城市名称，如：北京、上海、广州、苏州"
+            }
+          },
+          "required": [
+            "city"
+          ]
+        }
+      }
+    }
+  ],
+  "timestamp": "2026-06-09T13:47:48.222855"
+}
+2026-06-09 18:20:05,160 - INFO - Request: {
+  "round": 1,
+  "question": "今天南京的天气如何",
+  "model": "qwen3.6-plus",
+  "thinking_mode": false,
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "amapMaps.weather",
+        "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "城市名称，如：北京、上海、广州、苏州"
+            }
+          },
+          "required": [
+            "city"
+          ]
+        }
+      }
+    }
+  ],
+  "timestamp": "2026-06-09T18:20:05.160278"
+}

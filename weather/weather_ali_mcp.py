@@ -1,4 +1,4 @@
-# 高德地图天气查询 - 使用 dashscope 库和 MCP 工具
+# 高德地图天气查询 - 使用 dashscope 库和 MCP 工具 使用阿里云MCP 然后调用高德API
 # 基于测试验证的正确实现方式
 
 import dashscope
@@ -24,12 +24,14 @@ if not dashscope.api_key:
 # 检查高德地图 API Key
 AMAP_KEY = os.getenv("AMAP_API_KEY")
 
-if AMAP_KEY:
-    USE_REAL_DATA = True
-else:
-    print("⚠️  未配置 AMAP_API_KEY，将使用模拟数据")
-    print("   如需真实天气数据，请设置: export AMAP_API_KEY='your-key'")
-    USE_REAL_DATA = False
+if not AMAP_KEY:
+    print("❌ 错误：未找到 AMAP_API_KEY 环境变量")
+    print("\n请先设置环境变量：")
+    print("  export AMAP_API_KEY='your-key-here'")
+    print("  或在 ~/.zshrc 中添加: export AMAP_API_KEY='your-key-here'")
+    exit(1)
+
+USE_REAL_DATA = True
 
 # ==================== MCP 配置 ====================
 # 阿里云官方 MCP 配置格式
@@ -64,10 +66,11 @@ tools = [{
 
 # ==================== 天气数据获取函数 ====================
 def get_weather_data(city: str) -> dict:
-    
+
     # 如果配置了高德 API Key，尝试获取真实数据
     if USE_REAL_DATA and AMAP_KEY:
         try:
+            print(f"  🌐 调用高德 REST API 查询 {city} 实时天气...")
             url = "https://restapi.amap.com/v3/weather/weatherInfo"
             params = {
                 "key": AMAP_KEY,
@@ -79,8 +82,14 @@ def get_weather_data(city: str) -> dict:
             response.raise_for_status()
             data = response.json()
 
+            print(f"  📊 原始响应结构: {list(data.keys())}")
+            print(f"  🔍 完整数据: {data}")
+
             if data.get("status") == "1" and data.get("lives"):
                 live = data["lives"][0]
+                print(f"  🌡️  天气: {live.get('weather')}, 温度: {live.get('temperature')}°C")
+                print(f"  💧 湿度: {live.get('humidity')}%, 风向: {live.get('winddirection')}风 {live.get('windpower')}级")
+
                 return {
                     "city": city,
                     "province": live.get('province', ''),
@@ -95,6 +104,8 @@ def get_weather_data(city: str) -> dict:
                 print(f"  ⚠️  API 返回错误: {data.get('info', '未知错误')}")
         except Exception as e:
             print(f"  ⚠️  真实数据获取失败: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
     # 使用模拟数据
     import random

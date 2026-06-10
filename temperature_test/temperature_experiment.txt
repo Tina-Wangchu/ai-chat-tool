@@ -1,0 +1,4 @@
+Temperature to be tested: 0.0 0.5 1.0
+Repeats per question: 5
+Question1: 描述一下南京今天的天气，并谈谈这种天气给人的感觉。
+Question2: 上海今天的天气适合什么样的活动？请给出具体建议。

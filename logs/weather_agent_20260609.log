@@ -1,0 +1,161 @@
+2026-06-09 12:10:32 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_startup]: {"version": "2.0", "thinking_mode": false, "thinking_budget": 1000, "log_dir": "logs"}
+2026-06-09 12:10:32 - weather_agent.logger - INFO - 🚀 启动 MCP 服务器...
+2026-06-09 12:10:32 - weather_agent.logger - DEBUG - 启动命令: npx -y @amap/amap-maps-mcp-server
+2026-06-09 12:10:32 - weather_agent.logger - DEBUG - API Key: 2180341b...1662
+2026-06-09 12:10:34 - weather_agent.logger - INFO - ⚙️  系统事件 [mcp_server_started]: {"tools_count": 12, "tools": ["maps_regeocode", "maps_geo", "maps_ip_location", "maps_weather", "maps_search_detail", "maps_bicycling", "maps_direction_walking", "maps_direction_driving", "maps_direction_transit_integrated", "maps_distance", "maps_text_search", "maps_around_search"]}
+2026-06-09 12:10:44 - weather_agent.logger - INFO - 💬 用户问题: 今天杭州的天气如何
+2026-06-09 12:10:44 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "今天杭州的天气如何", "model": "qwen-max", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T12:10:44.096049"}
+2026-06-09 12:10:45 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1358.81",
+  "timestamp": "2026-06-09T12:10:45.455682"
+}
+2026-06-09 12:10:45 - weather_agent.logger - INFO - 🔍 开始查询天气: 杭州
+2026-06-09 12:10:45 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "杭州"}
+2026-06-09 12:10:45 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "杭州"}
+2026-06-09 12:10:45 - weather_agent.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-09T12:10:45.650603"}
+2026-06-09 12:10:49 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "3724.49",
+  "timestamp": "2026-06-09T12:10:49.375286"
+}
+2026-06-09 12:10:49 - weather_agent.logger - INFO - 💬 对话: User=今天杭州的天气如何... | AI=今天杭州的天气情况是小雨，气温在17°C到22°C之间，风向为西北风，风力等级为1-3级，湿度为62...
+2026-06-09 12:10:53 - weather_agent.logger - INFO - 💬 用户问题: 那北京呢
+2026-06-09 12:10:53 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "那北京呢", "model": "qwen-max", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T12:10:53.128071"}
+2026-06-09 12:10:54 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "929.26",
+  "timestamp": "2026-06-09T12:10:54.057694"
+}
+2026-06-09 12:10:54 - weather_agent.logger - INFO - 🔍 开始查询天气: 北京
+2026-06-09 12:10:54 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "北京"}
+2026-06-09 12:10:54 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "北京"}
+2026-06-09 12:10:54 - weather_agent.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-09T12:10:54.186894"}
+2026-06-09 12:10:57 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "3351.82",
+  "timestamp": "2026-06-09T12:10:57.538921"
+}
+2026-06-09 12:10:57 - weather_agent.logger - INFO - 💬 对话: User=那北京呢... | AI=根据高德地图 MCP 服务器的数据，北京的天气情况如下：
+
+- 天气：雷阵雨
+- 温度：16°C ~...
+2026-06-09 12:11:10 - weather_agent.logger - INFO - 💬 用户问题: 北京下周一 周二的天气如何
+2026-06-09 12:11:10 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "北京下周一 周二的天气如何", "model": "qwen-max", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T12:11:10.301384"}
+2026-06-09 12:11:11 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "1573.14",
+  "timestamp": "2026-06-09T12:11:11.874780"
+}
+2026-06-09 12:11:11 - weather_agent.logger - INFO - 🔍 开始查询天气: 北京
+2026-06-09 12:11:11 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "北京"}
+2026-06-09 12:11:12 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "北京"}
+2026-06-09 12:11:12 - weather_agent.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-09T12:11:12.010167"}
+2026-06-09 12:11:18 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "6827.80",
+  "timestamp": "2026-06-09T12:11:18.838194"
+}
+2026-06-09 12:11:18 - weather_agent.logger - INFO - 💬 对话: User=北京下周一 周二的天气如何... | AI=根据高德地图MCP服务器的数据，北京下周一和周二的天气预报如下：
+
+- **天气情况**：雷阵雨
+-...
+2026-06-09 13:08:29 - weather_agent.logger - INFO - 💬 用户问题: u qquit
+2026-06-09 13:08:29 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "u qquit", "model": "qwen-max", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T13:08:29.641426"}
+2026-06-09 13:08:30 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "stop",
+  "latency_ms": "1328.38",
+  "timestamp": "2026-06-09T13:08:30.970721"
+}
+2026-06-09 13:08:30 - weather_agent.logger - INFO - 💬 对话: User=u qquit... | AI=It seems like you might have entered a command by ...
+2026-06-09 13:08:30 - weather_agent.logger - INFO - ℹ️ 未触发工具调用，直接回复
+2026-06-09 13:08:33 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_shutdown]: {"final_thinking_state": false}
+2026-06-09 13:14:01 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_startup]: {"version": "2.0", "thinking_mode": false, "thinking_budget": 1000, "log_dir": "logs"}
+2026-06-09 13:14:01 - weather_agent.logger - INFO - 🚀 启动 MCP 服务器...
+2026-06-09 13:14:01 - weather_agent.logger - DEBUG - 启动命令: npx -y @amap/amap-maps-mcp-server
+2026-06-09 13:14:01 - weather_agent.logger - DEBUG - API Key: 2180341b...1662
+2026-06-09 13:14:03 - weather_agent.logger - INFO - ⚙️  系统事件 [mcp_server_started]: {"tools_count": 12, "tools": ["maps_regeocode", "maps_geo", "maps_ip_location", "maps_weather", "maps_search_detail", "maps_bicycling", "maps_direction_walking", "maps_direction_driving", "maps_direction_transit_integrated", "maps_distance", "maps_text_search", "maps_around_search"]}
+2026-06-09 13:14:03 - weather_agent.logger - ERROR - ❌ 错误: {"error_type": "FatalError", "error_message": "程序执行出错: EOF when reading a line", "traceback": "Traceback (most recent call last):\n  File \"/Users/tinawang/sophomore_tina/26Summer/ai-chat-tool/chat_with_tool_thinking.py\", line 1084, in <module>\n    question = input(f\"{thinking_indicator}请输入问题（或输入 help/quit）: \").strip()\n               ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nEOFError: EOF when reading a line\n"}
+2026-06-09 13:14:03 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_shutdown]: {"final_thinking_state": false}
+2026-06-09 13:20:21 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_startup]: {"version": "2.0", "thinking_mode": false, "thinking_budget": 1000, "log_dir": "logs"}
+2026-06-09 13:20:21 - weather_agent.logger - INFO - 🚀 启动 MCP 服务器...
+2026-06-09 13:20:21 - weather_agent.logger - DEBUG - 启动命令: npx -y @amap/amap-maps-mcp-server
+2026-06-09 13:20:21 - weather_agent.logger - DEBUG - API Key: 2180341b...1662
+2026-06-09 13:20:23 - weather_agent.logger - INFO - ⚙️  系统事件 [mcp_server_started]: {"tools_count": 12, "tools": ["maps_regeocode", "maps_geo", "maps_ip_location", "maps_weather", "maps_search_detail", "maps_bicycling", "maps_direction_walking", "maps_direction_driving", "maps_direction_transit_integrated", "maps_distance", "maps_text_search", "maps_around_search"]}
+2026-06-09 13:20:23 - weather_agent.logger - ERROR - ❌ 错误: {"error_type": "FatalError", "error_message": "程序执行出错: EOF when reading a line", "traceback": "Traceback (most recent call last):\n  File \"/Users/tinawang/sophomore_tina/26Summer/ai-chat-tool/chat_with_tool_thinking.py\", line 1133, in <module>\n    question = input(f\"{thinking_indicator}请输入问题（或输入 help/quit）: \").strip()\n               ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nEOFError: EOF when reading a line\n"}
+2026-06-09 13:20:23 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_shutdown]: {"final_thinking_state": false}
+2026-06-09 18:29:36 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_startup]: {"version": "2.0", "thinking_mode": false, "thinking_budget": 1000, "log_dir": "logs"}
+2026-06-09 18:29:36 - weather_agent.logger - INFO - 🚀 启动 MCP 服务器...
+2026-06-09 18:29:36 - weather_agent.logger - DEBUG - 启动命令: npx -y @amap/amap-maps-mcp-server
+2026-06-09 18:29:36 - weather_agent.logger - DEBUG - API Key: 2180341b...1662
+2026-06-09 18:29:38 - weather_agent.logger - INFO - ⚙️  系统事件 [mcp_server_started]: {"tools_count": 12, "tools": ["maps_regeocode", "maps_geo", "maps_ip_location", "maps_weather", "maps_search_detail", "maps_bicycling", "maps_direction_walking", "maps_direction_driving", "maps_direction_transit_integrated", "maps_distance", "maps_text_search", "maps_around_search"]}
+2026-06-09 18:29:44 - weather_agent.logger - INFO - 💬 用户问题: 今天南京的天气如何
+2026-06-09 18:29:44 - weather_agent.logger - DEBUG - 对话历史长度: 1
+2026-06-09 18:29:44 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "今天南京的天气如何", "model": "qwen-plus", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T18:29:44.795865"}
+2026-06-09 18:29:45 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "878.71",
+  "timestamp": "2026-06-09T18:29:45.675397"
+}
+2026-06-09 18:29:45 - weather_agent.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-09 18:29:45 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-09 18:29:45 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-09 18:29:45 - weather_agent.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-09T18:29:45.885787"}
+2026-06-09 18:29:49 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "3454.75",
+  "timestamp": "2026-06-09T18:29:49.340683"
+}
+2026-06-09 18:29:49 - weather_agent.logger - INFO - 💬 对话: User=今天南京的天气如何... | AI=今天南京天气：  
+🌤️ **多云**  
+🌡️ 气温：**18°C ～ 30°C**（昼夜温差较大...
+2026-06-09 18:32:52 - weather_agent.logger - INFO - 💬 用户问题: python -u "/Users/tinawang/sophomore_tina/26Summer/ai-chat-tool/main.py"
+2026-06-09 18:32:52 - weather_agent.logger - DEBUG - 对话历史长度: 3
+2026-06-09 18:32:52 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "python -u \"/Users/tinawang/sophomore_tina/26Summer/ai-chat-tool/main.py\"", "model": "qwen-plus", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T18:32:52.939130"}
+2026-06-09 18:32:55 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "stop",
+  "latency_ms": "2439.32",
+  "timestamp": "2026-06-09T18:32:55.378747"
+}
+2026-06-09 18:32:55 - weather_agent.logger - INFO - 💬 对话: User=python -u "/Users/tinawang/sophomore_tina/26Summer... | AI=It seems you're trying to run a Python script. How...
+2026-06-09 18:32:55 - weather_agent.logger - INFO - ℹ️ 未触发工具调用，直接回复
+2026-06-09 18:33:03 - weather_agent.logger - INFO - 💬 用户问题: 今天南京的天气如何
+2026-06-09 18:33:03 - weather_agent.logger - DEBUG - 对话历史长度: 5
+2026-06-09 18:33:03 - weather_agent.logger - INFO - 📡 API请求: {"round": 1, "question": "今天南京的天气如何", "model": "qwen-plus", "thinking_mode": false, "tools": [{"type": "function", "function": {"name": "amapMaps.weather", "description": "查询指定城市的实时天气信息，包括温度、湿度、风向等", "parameters": {"type": "object", "properties": {"city": {"type": "string", "description": "城市名称，如：北京、上海、广州、苏州"}}, "required": ["city"]}}}], "timestamp": "2026-06-09T18:33:03.817797"}
+2026-06-09 18:33:04 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 1,
+  "status_code": 200,
+  "finish_reason": "tool_calls",
+  "latency_ms": "898.53",
+  "timestamp": "2026-06-09T18:33:04.716776"
+}
+2026-06-09 18:33:04 - weather_agent.logger - INFO - 🔍 开始查询天气: 南京
+2026-06-09 18:33:04 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-09 18:33:04 - weather_agent.logger - INFO - 🔧 工具调用 [get_weather]: {"city": "南京"}
+2026-06-09 18:33:04 - weather_agent.logger - INFO - 📡 API请求: {"round": 2, "messages_count": 3, "tool_result_provided": true, "thinking_mode": false, "timestamp": "2026-06-09T18:33:04.868097"}
+2026-06-09 18:33:08 - weather_agent.logger - INFO - 📤 API响应: {
+  "round": 2,
+  "status_code": 200,
+  "latency_ms": "4081.28",
+  "timestamp": "2026-06-09T18:33:08.949519"
+}
+2026-06-09 18:33:08 - weather_agent.logger - INFO - 💬 对话: User=今天南京的天气如何... | AI=今天南京天气：  
+🌤️ **多云**  
+🌡️ 气温：**18°C ～ 30°C**（昼夜温差较大...
+2026-06-09 18:33:10 - weather_agent.logger - INFO - ⚙️  系统事件 [agent_shutdown]: {"final_thinking_state": false}

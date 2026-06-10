@@ -1,0 +1,20 @@
+2026-06-10 10:09:13,756 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: "pending"
+2026-06-10 10:09:13,946 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: {"status": "success", "execution_time_ms": 189.53680992126465, "data": {"city": "南京", "weather": "多云", "temperature": "20°C ~ 32°C", "wind": "西南风 1-3级", "humidity": "72%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:09:26,016 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: "pending"
+2026-06-10 10:09:26,164 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: {"status": "success", "execution_time_ms": 148.07486534118652, "data": {"city": "南京", "weather": "多云", "temperature": "20°C ~ 32°C", "wind": "西南风 1-3级", "humidity": "58%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:09:39,719 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: "pending"
+2026-06-10 10:09:39,849 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: {"status": "success", "execution_time_ms": 129.81510162353516, "data": {"city": "南京", "weather": "多云", "temperature": "20°C ~ 32°C", "wind": "西南风 1-3级", "humidity": "55%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:09:50,322 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: "pending"
+2026-06-10 10:09:50,470 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: {"status": "success", "execution_time_ms": 147.5691795349121, "data": {"city": "南京", "weather": "多云", "temperature": "20°C ~ 32°C", "wind": "西南风 1-3级", "humidity": "69%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:09:58,346 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: "pending"
+2026-06-10 10:09:58,468 - INFO - Tool: get_weather | Args: {"city": "南京"} | Result: {"status": "success", "execution_time_ms": 122.01189994812012, "data": {"city": "南京", "weather": "多云", "temperature": "20°C ~ 32°C", "wind": "西南风 1-3级", "humidity": "41%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:10:13,020 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: "pending"
+2026-06-10 10:10:13,152 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: {"status": "success", "execution_time_ms": 131.95276260375977, "data": {"city": "上海", "weather": "阴", "temperature": "22°C ~ 31°C", "wind": "南风 1-3级", "humidity": "78%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:10:24,631 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: "pending"
+2026-06-10 10:10:24,779 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: {"status": "success", "execution_time_ms": 146.66295051574707, "data": {"city": "上海", "weather": "阴", "temperature": "22°C ~ 31°C", "wind": "南风 1-3级", "humidity": "54%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:10:41,273 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: "pending"
+2026-06-10 10:10:41,405 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: {"status": "success", "execution_time_ms": 131.0718059539795, "data": {"city": "上海", "weather": "阴", "temperature": "22°C ~ 31°C", "wind": "南风 1-3级", "humidity": "64%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:11:00,818 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: "pending"
+2026-06-10 10:11:00,961 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: {"status": "success", "execution_time_ms": 142.68922805786133, "data": {"city": "上海", "weather": "阴", "temperature": "22°C ~ 31°C", "wind": "南风 1-3级", "humidity": "71%", "source": "高德地图 MCP 服务器数据"}}
+2026-06-10 10:11:24,091 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: "pending"
+2026-06-10 10:11:24,254 - INFO - Tool: get_weather | Args: {"city": "上海"} | Result: {"status": "success", "execution_time_ms": 162.71686553955078, "data": {"city": "上海", "weather": "阴", "temperature": "22°C ~ 31°C", "wind": "南风 1-3级", "humidity": "71%", "source": "高德地图 MCP 服务器数据"}}
