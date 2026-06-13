@@ -1,6 +1,7 @@
 # AI Chat Tool - 天气查询助手
 
 一个基于阿里云百炼（Dashscope）和高德地图 API 的智能天气查询系统，支持 MCP 工具调用、流式输出、思考模式和多角色对话。
+英文版README见README_EN.md (For English README, see README_EN.md)
 
 ## 项目概述
 
@@ -229,7 +230,7 @@ MIT License
 
 ## 联系方式
 
-- 项目地址：[GitHub Repository]
+- 项目地址: https://github.com/Tina-Wangchu/ai-chat-tool.git
 - 作者：Tina Wang
 - 完成时间：2025年6月
 
@@ -241,4 +242,4 @@ MIT License
 
 ---
 
-⚠️ **注意**：请勿在代码中硬编码 API 密钥，始终使用环境变量。提交到 GitHub 前请确保没有包含敏感信息。
+

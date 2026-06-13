@@ -252,7 +252,7 @@ MIT License
 
 ## Contact
 
-- Project Repository: [GitHub Repository]
+- Project Repository: [\[GitHub Repository\]](https://github.com/Tina-Wangchu/ai-chat-tool.git)
 - Author: Tina Wang
 - Completion Date: June 2025
 
@@ -264,4 +264,4 @@ MIT License
 
 ---
 
-⚠️ **Note**: Do not hardcode API keys in code. Always use environment variables. Ensure no sensitive information is included before committing to GitHub.
+
