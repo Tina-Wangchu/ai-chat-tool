@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs - 排除所有日志文件
+logs/
+*.log
+temp_log/
+temperature_test/temp_log/
+
+# 实验数据 - 可选：如果不想提交实验结果数据
+# experiments/
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+._*
+
+# 测试输出
+test_outputs/
+outputs/
+
+# Word/Office 临时文件
+~$*
+*.tmp
+
+# 敏感信息
+.env
+.env.local
+*secret*
+*private*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Claude Code 项目文件
+.claude/projects/
+.claude/memory/
+
+# 占位符日志文件
+weather_agent_*.log
+
+# 特定测试文件（如果不想提交）
+four_questions/role.json
+four_questions/think_mode.json
+
+# 配置文件中的敏感信息（需要手动处理）
+# config.yaml - 如果包含真实API密钥，应提交 config.yaml.example

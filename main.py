@@ -16,10 +16,11 @@ import logging.handlers
 from datetime import datetime
 from pathlib import Path
 import yaml
+import concurrent.futures  # ✅ 新增：用于并行执行工具调用
 
 # 导入配置加载模块
 try:
-    from config_load import load_config, get_model_params
+    from config_load import load_config
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
@@ -65,6 +66,7 @@ ROLES = {
 }
 
 # ==================== 配置加载 ====================
+# 默认配置（仅作为 config.yaml 不存在时的备份）
 config = {
     "api": {
         "model": "qwen-max",
@@ -72,8 +74,8 @@ config = {
     },
     "model_parameters": {
         "temperature": 0.7,
-        "top_p": 0.9,
-        "max_tokens": 2000
+        "top_p": 1.0,
+        "max_tokens": 20000
     },
     "thinking": {
         "enabled": False,
@@ -81,6 +83,7 @@ config = {
     }
 }
 
+# 从 config.yaml 加载配置（优先级高于默认值）
 if CONFIG_AVAILABLE:
     try:
         config_from_file = load_config()
@@ -109,30 +112,11 @@ if not DASHSCOPE_API_KEY:
 dashscope.api_key = DASHSCOPE_API_KEY
 
 # ==================== 思考模式配置 ====================
-def get_thinking_mode_config():
-    """获取思考模式配置"""
-    thinking_config_from_file = config.get('thinking', {
-        "enabled": False,
-        "budget": 1000
-    })
-    
-    if thinking_config_from_file.get('enabled'):
-        return thinking_config_from_file
-    
-    thinking_config = {
-        "enabled": False,
-        "budget": 1000
-    }
-    
-    env_thinking = os.getenv("ENABLE_THINKING", "").lower()
-    if env_thinking in ["true", "1", "yes", "on"]:
-        thinking_config["enabled"] = True
-    elif env_thinking in ["false", "0", "no", "off"]:
-        thinking_config["enabled"] = False
-    
-    return thinking_config
-
-thinking_config = get_thinking_mode_config()
+# 直接从 config.yaml 读取思考模式配置
+thinking_config = config.get('thinking', {
+    "enabled": False,
+    "budget": 1000
+})
 
 # ==================== 日志记录系统 ====================
 class AgentLogger:
@@ -578,6 +562,145 @@ def get_weather_data(city: str, client: AmapMCPClient, logger=None) -> dict:
     
     return fallback_data
 
+# ==================== 并行工具执行函数 ====================
+def execute_single_tool(tool_name: str, tool_args: dict, client: AmapMCPClient, logger=None) -> str:
+    """
+    执行单个工具调用（用于并行执行）
+
+    Args:
+        tool_name: 工具名称
+        tool_args: 工具参数
+        client: MCP 客户端
+        logger: 日志记录器
+
+    Returns:
+        JSON 字符串格式的结果
+    """
+    # ✅ 支持多种工具名称映射（兼容Dashscope API返回的名称）
+    weather_tools = ["get_weather", "amapMaps.weather", "maps_weather"]
+
+    if tool_name in weather_tools:
+        city = tool_args.get("city", "")
+
+        if logger:
+            logger.logger.info(f"🔧 执行天气查询工具: {tool_name}, 城市: {city}")
+            logger.log_tool_call(tool_name, {"city": city}, "started")
+
+        weather_data = get_weather_data(city, client, logger)
+
+        if logger:
+            logger.log_tool_call(tool_name, {"city": city}, {
+                "status": "success",
+                "data": weather_data
+            })
+            logger.logger.info(f"✅ 工具执行完成: {tool_name}")
+
+        return json.dumps(weather_data, ensure_ascii=False)
+    else:
+        if logger:
+            logger.logger.warning(f"⚠️ 未知工具: {tool_name}")
+            logger.log_tool_call(tool_name, tool_args, {"status": "unknown_tool"})
+        return json.dumps({"error": f"未知工具: {tool_name}"}, ensure_ascii=False)
+
+
+def execute_tools_parallel(tool_calls, messages, client: AmapMCPClient, logger=None, show_details=False):
+    """
+    并行执行多个工具调用
+
+    Args:
+        tool_calls: 工具调用列表
+        messages: 消息列表（用于添加工具返回结果）
+        client: MCP 客户端
+        logger: 日志记录器
+        show_details: 是否显示详细信息
+    """
+    if len(tool_calls) == 0:
+        return
+
+    if show_details:
+        print(f"\n🔄 需要调用 {len(tool_calls)} 个工具，开始并行执行...")
+
+    # 使用线程池并行执行
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # 提交所有任务到线程池
+        # ✅ 兼容处理字典和对象格式的tool_calls
+        futures = {}
+        for tc in tool_calls:
+            if isinstance(tc, dict):
+                # 字典格式
+                tc_id = tc.get("id")
+                tc_function_name = tc.get("function", {}).get("name")
+                tc_arguments = tc.get("function", {}).get("arguments", "{}")
+            else:
+                # 对象格式
+                tc_id = tc.id
+                tc_function_name = tc.function.name
+                tc_arguments = tc.function.arguments
+
+            futures[tc_id] = executor.submit(
+                execute_single_tool,
+                tc_function_name,
+                json.loads(tc_arguments) if isinstance(tc_arguments, str) else tc_arguments,
+                client,
+                logger
+            )
+
+        # 等待所有任务完成并获取结果
+        for tc in tool_calls:
+            try:
+                # ✅ 兼容处理字典和对象格式
+                if isinstance(tc, dict):
+                    tc_id = tc.get("id")
+                    tc_function_name = tc.get("function", {}).get("name")
+                    tc_arguments = tc.get("function", {}).get("arguments", "{}")
+                else:
+                    tc_id = tc.id
+                    tc_function_name = tc.function.name
+                    tc_arguments = tc.function.arguments
+
+                result = futures[tc_id].result(timeout=15)  # 等待结果，最多15秒
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "content": result
+                })
+                if show_details:
+                    args = json.loads(tc_arguments) if isinstance(tc_arguments, str) else tc_arguments
+                    city = args.get("city", "未知")
+                    print(f"✅ {city} 的天气查询完成")
+            except concurrent.futures.TimeoutError:
+                # ✅ 兼容处理字典和对象格式
+                if isinstance(tc, dict):
+                    tc_id = tc.get("id")
+                    tc_function_name = tc.get("function", {}).get("name")
+                else:
+                    tc_id = tc.id
+                    tc_function_name = tc.function.name
+
+                if show_details:
+                    print(f"⏰ 工具 {tc_function_name} ({tc_id}) 超时")
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "content": json.dumps({"error": "执行超时"}, ensure_ascii=False)
+                })
+            except Exception as e:
+                # ✅ 兼容处理字典和对象格式
+                if isinstance(tc, dict):
+                    tc_id = tc.get("id")
+                    tc_function_name = tc.get("function", {}).get("name")
+                else:
+                    tc_id = tc.id
+                    tc_function_name = tc.function.name
+
+                if show_details:
+                    print(f"❌ 工具 {tc_function_name} ({tc_id}) 执行失败: {str(e)}")
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "content": json.dumps({"error": str(e)}, ensure_ascii=False)
+                })
+
 # ==================== 角色选择系统 ====================
 def select_role(conversation_history):
     """让用户选择角色"""
@@ -723,7 +846,7 @@ def handle_thinking_command(cmd: str, current_thinking_state: bool) -> bool:
         print("🧠 模型将进行深度推理，回答质量更高但响应稍慢")
         return True
     
-    elif cmd_lower in ["关闭思考", "禁用思考", "0", "off", "disable"]:
+    elif cmd_lower in ["关闭思考", "禁用思考", "2", "0", "off", "disable"]:
         print("\n❌ 思考模式已关闭")
         print("⚡ 模型将快速回答，适合简单问题")
         return False
@@ -737,7 +860,11 @@ def handle_thinking_command(cmd: str, current_thinking_state: bool) -> bool:
             print("⚡ 快速回答模式")
             print("🎯 适用于：简单问答、快速查询")
         return current_thinking_state
-    
+
+    elif cmd_lower in ["返回", "back", "4", "exit"]:
+        print("\n🔙 返回主对话")
+        return current_thinking_state  # 保持当前状态，直接返回
+
     else:
         print(f"\n⚠️  未知命令：{cmd}")
         print("请输入：启用/关闭思考，或输入'help'查看帮助")
@@ -792,14 +919,13 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
         
         # 如果启用思考模式，添加 thinking 配置
         if thinking_enabled:
-            extra_body["thinking"] = {
-                "enabled": True,
-                "budget": 1000
-            }
-            print("  💡 思考模式配置：budget=1000，模型将进行深度推理")
-            
+            # ✅ 使用正确的阿里云API参数格式
+            extra_body["enable_thinking"] = True
+            extra_body["thinking_budget"] = thinking_config.get("budget", 1000)
+            print(f"  💡 思考模式配置：enable_thinking=True, budget={thinking_config.get('budget', 1000)}，模型将进行深度推理")
+
             if logger:
-                logger.log_thinking_process("思考模式已启用，budget=1000")
+                logger.log_thinking_process(f"思考模式已启用，budget={thinking_config.get('budget', 1000)}")
         
         # 记录请求（传递完整对话历史）
         if logger:
@@ -823,7 +949,30 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
         )
         end_time = time.time()
         latency_ms = (end_time - start_time) * 1000
-        
+
+        # ✅ 添加错误处理：检查 resp.output 是否为 None
+        if resp.output is None:
+            error_msg = f"API返回空响应 (status_code: {resp.status_code})"
+            if logger:
+                logger.logger.error(f"❌ {error_msg}")
+                logger.logger.error(f"完整响应: {resp}")
+
+            print(f"\n❌ 错误：API返回空响应")
+            print(f"状态码: {resp.status_code}")
+            print(f"模型: {config['api']['model']}")
+
+            # 检查是否是模型问题
+            if "qwen3.7-max" in config['api']['model'] or "qwen3.7-plus" in config['api']['model']:
+                print(f"\n💡 可能原因：")
+                print(f"   - {config['api']['model']} 模型可能不稳定或有bug")
+                print(f"   - 建议使用稳定的 'qwen-max' 模型")
+                print(f"\n🔧 修复建议：")
+                print(f"   修改 config.yaml:")
+                print(f"   api:")
+                print(f"     model: qwen-max")
+
+            return f"抱歉，AI模型返回了空响应。请尝试重新提问或更换模型。"
+
         choice = resp.output.choices[0]
         
         # 记录响应
@@ -838,34 +987,80 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
         
         # 检查是否有工具调用
         if choice.finish_reason == "tool_calls" and hasattr(choice.message, 'tool_calls'):
-            tool_call = choice.message.tool_calls[0]
-            tool_name = tool_call['function']['name']
-            tool_args_str = tool_call['function']['arguments']
-            
-            # 获取城市
-            city = json.loads(tool_args_str).get("city", "未知")
-            
-            # 执行工具（获取天气数据）
+            tool_calls = choice.message.tool_calls
+
             if show_details:
-                print(f"\n🔧 正在查询 {city} 的天气...")
-            
-            # 获取天气数据
-            import random
-            weather_data = get_weather_data(city, client, logger)
-            
-            # 构建包含工具结果的对话消息
+                cities = []
+                for tc in tool_calls:
+                    try:
+                        # 兼容字典和对象两种格式
+                        if isinstance(tc, dict):
+                            args = json.loads(tc.get("function", {}).get("arguments", "{}"))
+                            city = args.get("city", "未知")
+                        else:
+                            args = json.loads(tc.function.arguments)
+                            city = args.get("city", "未知")
+                        cities.append(city)
+                    except:
+                        pass
+                print(f"\n🔧 正在查询 {len(cities)} 个城市的天气: {', '.join(cities)}...")
+
+            # 构建包含工具调用的对话消息
             messages_2 = list(conversation_history)  # 复制完整历史
+
+            # ✅ 调试：记录原始tool_calls结构
+            if logger:
+                logger.logger.debug(f"🔍 [DEBUG] 原始tool_calls类型: {type(tool_calls)}")
+                logger.logger.debug(f"🔍 [DEBUG] 原始tool_calls结构: {json.dumps(tool_calls, ensure_ascii=False, default=str)}")
+
+            # ✅ 兼容处理字典和对象格式的tool_calls
+            formatted_tool_calls = []
+            for tc in tool_calls:
+                if isinstance(tc, dict):
+                    # 字典格式
+                    formatted_tool_calls.append({
+                        "id": tc.get("id"),
+                        "function": {
+                            "name": tc.get("function", {}).get("name"),
+                            "arguments": tc.get("function", {}).get("arguments")
+                        }
+                    })
+                else:
+                    # 对象格式
+                    formatted_tool_calls.append({
+                        "id": tc.id,
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments
+                        }
+                    })
+
+            # ✅ 调试：记录格式化后tool_calls
+            if logger:
+                logger.logger.debug(f"🔍 [DEBUG] 格式化后tool_calls: {json.dumps(formatted_tool_calls, ensure_ascii=False)}")
+
             messages_2.append({
                 "role": "assistant",
                 "content": None,
-                "tool_calls": [tool_call]
+                "tool_calls": formatted_tool_calls
             })
-            messages_2.append({
-                "role": "tool",
-                "tool_call_id": tool_call["id"],
-                "content": json.dumps(weather_data, ensure_ascii=False)
-            })
-            
+
+            # ✅ 调试：记录添加assistant消息后的messages_2
+            if logger:
+                logger.logger.debug(f"🔍 [DEBUG] 添加assistant消息后，messages_2长度: {len(messages_2)}")
+                logger.logger.debug(f"🔍 [DEBUG] messages_2最后一条: {json.dumps(messages_2[-1], ensure_ascii=False)}")
+
+            # ✅ 并行执行所有工具调用
+            execute_tools_parallel(tool_calls, messages_2, client, logger, show_details)
+
+            # ✅ 调试：记录执行工具后的完整messages_2结构
+            if logger:
+                logger.logger.debug(f"🔍 [DEBUG] 执行工具后messages_2总长度: {len(messages_2)}")
+                # 显示最后3条消息（通常包含原始问题、assistant工具调用、tool结果）
+                logger.logger.debug(f"🔍 [DEBUG] messages_2最后3条消息:")
+                for i, msg in enumerate(messages_2[-3:], start=len(messages_2)-3):
+                    logger.logger.debug(f"  [{i}] role={msg.get('role')}, content={msg.get('content', None) if msg.get('role') != 'tool' else '<tool_result>'}, tool_call_id={msg.get('tool_call_id', 'N/A')}")
+
             # 第二轮：让 AI 根据工具数据生成回复（流式输出）
             extra_body_2 = {
                 "mcp": mcp_cfg,
@@ -873,10 +1068,9 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
             }
 
             if thinking_enabled:
-                extra_body_2["thinking"] = {
-                    "enabled": True,
-                    "budget": 1000
-                }
+                # ✅ 使用正确的阿里云API参数格式
+                extra_body_2["enable_thinking"] = True
+                extra_body_2["thinking_budget"] = thinking_config.get("budget", 1000)
             
             # 记录第二轮请求
             if logger:
@@ -908,26 +1102,67 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
             print("🤖 AI: ", end="", flush=True)
 
             # Dashscope 流式输出处理
+            full_reasoning = ""  # 存储完整的思考内容
+
             for chunk in resp2:
                 try:
                     # Dashscope 流式格式: chunk.output.choices[0].message.content
                     if hasattr(chunk, 'output') and chunk.output:
                         if hasattr(chunk.output, 'choices') and chunk.output.choices:
                             message = chunk.output.choices[0].message
-                            if hasattr(message, 'content') and message.content:
+
+                            # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
+                            try:
+                                reasoning_content = message.reasoning_content
+                                if reasoning_content:
+                                    # 记录思考内容到日志
+                                    if logger:
+                                        # 记录新增的思考内容
+                                        new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
+                                        if new_reasoning:
+                                            logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
+                                    full_reasoning = reasoning_content
+                            except (KeyError, AttributeError):
+                                # reasoning_content不存在或无法访问，跳过
+                                pass
+
+                            # 处理响应内容
+                            try:
                                 content = message.content
-                                if content and len(content) > previous_length:
-                                    # ✅ 只打印新增的部分（增量）
-                                    new_content = content[previous_length:]
-                                    print(new_content, end="", flush=True)
-                                    previous_length = len(content)
-                                    full_response = content  # 保存完整内容
+                                if content:
+                                    # ✅ 直接使用完整content（流式输出每次都是累积的）
+                                    if len(content) > previous_length:
+                                        # 只打印新增的部分（增量）
+                                        new_content = content[previous_length:]
+                                        print(new_content, end="", flush=True)
+                                        previous_length = len(content)
+
+                                    # ✅ 始终更新full_response为最新的完整content
+                                    full_response = content
+
+                                    # ✅ 调试：记录content长度变化
+                                    if logger and len(content) % 50 == 0:  # 每50字符记录一次
+                                        logger.logger.debug(f"📝 Content长度: {len(content)} 字符")
+                            except (KeyError, AttributeError):
+                                # content不存在或无法访问，跳过
+                                pass
+
                 except (AttributeError, IndexError) as e:
                     # 跳过无法处理的chunk
                     continue
 
+            # ✅ 如果有思考内容,记录完整的思考过程
+            if full_reasoning and logger:
+                logger.logger.info(f"🧠 完整思考过程长度: {len(full_reasoning)} 字符")
+
+            # ✅ 记录最终响应长度
+            if logger:
+                logger.logger.info(f"📝 最终响应长度: {len(full_response)} 字符")
+                if len(full_response) < 50:
+                    logger.logger.warning(f"⚠️ 响应异常短: {full_response}")
+
             print()  # 完成后换行
-            
+
             end_time_2 = time.time()
             latency_ms_2 = (end_time_2 - start_time_2) * 1000
             
@@ -960,10 +1195,9 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
             }
 
             if thinking_enabled:
-                extra_body_direct["thinking"] = {
-                    "enabled": True,
-                    "budget": 1000
-                }
+                # ✅ 使用正确的阿里云API参数格式
+                extra_body_direct["enable_thinking"] = True
+                extra_body_direct["thinking_budget"] = thinking_config.get("budget", 1000)
             
             if show_details:
                 print(f"💬 AI 直接回复（未调用工具）")
@@ -984,13 +1218,32 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
             print("🤖 AI: ", end="", flush=True)
 
             # Dashscope 流式输出处理
+            full_reasoning = ""  # 存储完整的思考内容
+
             for chunk in resp_direct:
                 try:
                     # Dashscope 流式格式: chunk.output.choices[0].message.content
                     if hasattr(chunk, 'output') and chunk.output:
                         if hasattr(chunk.output, 'choices') and chunk.output.choices:
                             message = chunk.output.choices[0].message
-                            if hasattr(message, 'content') and message.content:
+
+                            # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
+                            try:
+                                reasoning_content = message.reasoning_content
+                                if reasoning_content:
+                                    # 记录思考内容到日志
+                                    if logger:
+                                        # 记录新增的思考内容
+                                        new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
+                                        if new_reasoning:
+                                            logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
+                                    full_reasoning = reasoning_content
+                            except (KeyError, AttributeError):
+                                # reasoning_content不存在或无法访问，跳过
+                                pass
+
+                            # 处理响应内容
+                            try:
                                 content = message.content
                                 if content and len(content) > previous_length:
                                     # ✅ 只打印新增的部分（增量）
@@ -998,9 +1251,17 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
                                     print(new_content, end="", flush=True)
                                     previous_length = len(content)
                                     direct_reply = content  # 保存完整内容
+                            except (KeyError, AttributeError):
+                                # content不存在或无法访问，跳过
+                                pass
+
                 except (AttributeError, IndexError) as e:
                     # 跳过无法处理的chunk
                     continue
+
+            # ✅ 如果有思考内容,记录完整的思考过程
+            if full_reasoning and logger:
+                logger.logger.info(f"🧠 完整思考过程长度: {len(full_reasoning)} 字符")
 
             print()  # 完成后换行
             
