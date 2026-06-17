@@ -34,10 +34,10 @@ model_parameters:
   max_tokens: 20000
 
 stream:
-  enabled: true
+  enabled: false
   extra_body:
     enable_passage_insertion: false
-    incremental_output: true
+    incremental_output: false
 
 thinking:
   enabled: false

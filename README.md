@@ -32,27 +32,41 @@
 
 ```
 ai-chat-tool/
-├── main.py                           # 主程序入口
+├── src/                              # 源代码目录
+│   ├── main.py                       # 主程序入口
+│   ├── config_load.py                # 配置加载模块
+│   ├── weather/                      # 天气查询模块
+│   │   ├── weather_ali_mcp.py       # 阿里云 MCP 实现
+│   │   ├── weather_amap_mcp.py      # 本地 MCP 实现
+│   │   ├── weather_direct_api.py    # 直接 API 调用
+│   │   └── weather_manual_amap_mcp.py  # 手动 JSON-RPC 实现
+│   └── experiments/                  # 实验性代码
+│       ├── cot_experiment.py        # CoT 实验
+│       └── temperature_tester.py   # 温度测试工具
 ├── config.yaml                       # 配置文件
-├── config_load.py                    # 配置加载模块
-├── weather/                          # 天气查询模块
-│   ├── weather_ali_mcp.py           # 阿里云 MCP 实现
-│   ├── weather_amap_mcp.py          # 本地 MCP 实现
-│   ├── weather_direct_api.py        # 直接 API 调用
-│   ├── weather_manual_amap_mcp.py    # 手动 JSON-RPC 实现
-│   └── tool_call_compare.md         # 工具调用对比文档
-├── test/                             # 测试和文档
-│   ├── *.py                         # 各种测试脚本
-│   ├── *.md                         # 技术文档
-│   └── function_test.md             # 功能测试报告
+├── logs/                             # 日志目录
+│   ├── production/                   # 生产环境日志
+│   ├── temperature_tests/            # 温度测试日志
+│   ├── testing/                      # 测试日志
+│   ├── archived/                     # 历史归档日志
+│   └── README.md                     # 日志说明文档
+├── test/                             # 测试目录
+│   ├── core/                         # 核心功能测试
+│   ├── thinking_mode/                # 思考模式测试
+│   ├── tool_calling/                 # 工具调用测试
+│   ├── logging/                      # 日志系统测试
+│   ├── debug/                        # 调试测试
+│   ├── docs/                         # 测试文档
+│   └── function_test.md              # 功能测试报告
 ├── CoT/                              # Chain of Thought 实验
-│   ├── cot_experiment.py            # CoT 实验脚本
-│   └── experiments/                  # 实验结果数据
-├── temperature_test/                 # 温度参数测试
-│   ├── temperature_tester.py        # 温度测试工具
-│   └── *.md                         # 测试报告和分析
-└── devleopment/                      # 开发过程文件
-    └── *.py                         # 开发阶段的示例代码
+│   └── experiments/                  # 实验数据
+├── temperature/                       # 温度参数测试
+│   └── *.md                          # 测试报告
+├── paper/                            # 研究论文
+├── develope_progress/                # 开发历史
+├── four_questions/                   # 实验配置
+├── README.md                         # 项目说明
+└── README_EN.md                      # 英文版说明
 ```
 
 ## 快速开始
@@ -87,7 +101,15 @@ npm install -g @amap/amap-maps-mcp-server
 
 4. **运行程序**
 ```bash
-python main.py
+# 方式 1：直接运行（从项目根目录）
+python src/main.py
+
+# 方式 2：使用模块运行
+python -m src.main
+
+# 方式 3：创建启动脚本
+echo 'import sys; from pathlib import Path; sys.path.insert(0, str(Path(__file__).parent)); from src.main import main; main()' > run.py
+python run.py
 ```
 
 ## 使用指南
@@ -153,6 +175,61 @@ thinking:
 | `DASHSCOPE_API_KEY` | 阿里云百炼 API 密钥 | [阿里云百炼控制台](https://bailian.console.aliyun.com/) |
 | `AMAP_API_KEY` | 高德地图 API 密钥 | [高德开放平台](https://lbs.amap.com/) |
 
+## 日志系统
+
+### 日志位置
+
+所有日志文件存储在 `logs/` 目录中。
+
+### 日志组织
+
+- **logs/production/** - 当前生产环境日志
+- **logs/temperature_tests/** - 温度参数测试日志
+- **logs/testing/** - 功能测试专用日志
+- **logs/archived/** - 历史归档日志
+
+### 日志类型
+
+本系统实现 7 种专用日志：
+
+1. **主日志** (`weather_agent_YYYYMMDD.log`)
+   - 所有运行信息、调试消息
+
+2. **JSON 日志** (`weather_agent_json_YYYYMMDD.jsonl`)
+   - 机器可读的结构化日志（JSONL 格式）
+
+3. **API 日志** (`*_api_*.log`)
+   - HTTP 请求/响应、延迟、状态码
+
+4. **工具日志** (`*_tool_*.log`)
+   - MCP 工具调用、参数、执行结果
+
+5. **思考日志** (`*_thinking_*.log`)
+   - AI 推理过程、思考预算使用
+
+6. **错误日志** (`*_error_*.log`)
+   - 异常和错误追踪
+
+7. **输出日志** (`*_outputs.log`)
+   - 完整对话记录（用于温度参数对比）
+
+### 查看最新日志
+
+```bash
+# 查看今天的日志
+tail -f logs/production/weather_agent_$(date +%Y%m%d).log
+
+# 查看今天的 JSON 日志
+cat logs/production/weather_agent_json_$(date +%Y%m%d).jsonl
+
+# 查看错误日志
+tail -f logs/production/weather_agent_error_$(date +%Y%m%d).log
+```
+
+### 日志分析
+
+详细日志说明请参阅：[日志目录 README](logs/README.md)
+
 ## 测试
 
 ### 运行功能测试
@@ -162,31 +239,31 @@ python test/function_test_automation.py
 
 ### 运行天气查询测试
 ```bash
-python test/test_with_amap_key.py
+python test/tool_calling/test_tool_calling_mcp_amap_integration.py
 ```
 
 ### 温度参数测试
 ```bash
-python temperature_test/temperature_tester.py
+python src/experiments/temperature_tester.py
 ```
 
 查看测试报告：
 - [功能测试报告](test/function_test.md)
-- [工具调用对比](weather/tool_call_compare.md)
-- [温度测试分析](temperature_test/temperature_analysis.md)
+- [工具调用对比](src/weather/tool_call_compare.md)
+- [温度测试分析](temperature/temperature_analysis.md)
 
 ## 文档
 
 ### 技术文档
-- [MCP 协议详解](test/agent_logger_explanation.md)
-- [流式输出算法](test/stream_algorithm.md)
-- [日志系统指南](test/ai_agent_logging_guide.md)
-- [配置文件说明](test/config_guide.md)
+- [MCP 协议详解](test/docs/agent_logger_explanation.md)
+- [流式输出算法](test/docs/stream_algorithm.md)
+- [日志系统指南](test/docs/ai_agent_logging_guide.md)
+- [配置文件说明](test/docs/config_guide.md)
 
 ### 开发文档
 - [CoT 实验报告](CoT/CoT_test_report.md)
 - [思考模式实现](CoT/think_mode/THINKING_MODE_IMPLEMENTATION.md)
-- [API 输出日志指南](test/AI_OUTPUT_LOG_GUIDE.md)
+- [API 输出日志指南](test/docs/AI_OUTPUT_LOG_GUIDE.md)
 
 ## 常见问题
 
@@ -202,11 +279,12 @@ python temperature_test/temperature_tester.py
 3. 检查 `AMAP_API_KEY` 环境变量
 
 ### Q: 日志文件在哪里？
-日志存储在 `logs/` 目录，包括：
-- `weather_agent_*.log` - 主日志
-- `weather_agent_api_*.log` - API 调用日志
-- `weather_agent_tool_*.log` - 工具调用日志
-- `weather_agent_thinking_*.log` - 思考过程日志
+日志存储在 `logs/` 目录中，按照类型组织：
+- `logs/production/` - 当前生产环境日志（最新日志）
+- `logs/archived/` - 历史归档日志
+- `logs/temperature_tests/` - 温度参数测试日志
+
+详细说明请参阅：[日志目录 README](logs/README.md)
 
 ## 开发历程
 

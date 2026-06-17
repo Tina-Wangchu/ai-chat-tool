@@ -9,6 +9,7 @@
 import subprocess
 import json
 import os
+import sys
 import time
 import argparse
 import logging
@@ -18,13 +19,22 @@ from pathlib import Path
 import yaml
 import concurrent.futures  # ✅ 新增：用于并行执行工具调用
 
+# ✅ 添加项目根目录到 PYTHONPATH（支持从 src/ 运行）
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 # 导入配置加载模块
 try:
-    from config_load import load_config
+    from src.config_load import load_config
     CONFIG_AVAILABLE = True
 except ImportError:
-    CONFIG_AVAILABLE = False
-    print("⚠️  警告：未找到 config_load 模块，将使用默认配置")
+    try:
+        # 备用导入：支持直接从项目根目录运行
+        from config_load import load_config
+        CONFIG_AVAILABLE = True
+    except ImportError:
+        CONFIG_AVAILABLE = False
+        print("⚠️  警告：未找到 config_load 模块，将使用默认配置")
 
 import dashscope
 from dashscope import Generation
@@ -116,6 +126,12 @@ dashscope.api_key = DASHSCOPE_API_KEY
 thinking_config = config.get('thinking', {
     "enabled": False,
     "budget": 1000
+})
+
+# ==================== 流式输出配置 ====================
+# 直接从 config.yaml 读取流式输出配置
+stream_config = config.get('stream', {
+    "enabled": True
 })
 
 # ==================== 日志记录系统 ====================
@@ -814,6 +830,12 @@ def print_help():
     print("  - /thinking     - 切换思考模式")
     print("  - 启用后模型会深度推理，回答更详细")
     print("  - 关闭时快速回答，适合简单问题")
+    print("\n📡 流式输出：")
+    print("  - /stream       - 切换流式输出模式")
+    print("  - 启用后实时显示AI回复内容（逐字显示）")
+    print("  - 关闭后等待完整回复后一次性显示")
+    print("  - 流式输出：响应更快，用户体验更好")
+    print("  - 非流式：适合需要完整内容的场景")
     print("\n💬 对话管理：")
     print("  - /clear        - 清空所有对话历史")
     print("  - /clear N      - 保留最近 N 组对话")
@@ -840,17 +862,17 @@ def show_thinking_menu():
 def handle_thinking_command(cmd: str, current_thinking_state: bool) -> bool:
     """处理思考模式相关命令"""
     cmd_lower = cmd.lower().strip()
-    
+
     if cmd_lower in ["启用思考", "开启思考", "1", "on", "enable"]:
         print("\n✅ 思考模式已启用")
         print("🧠 模型将进行深度推理，回答质量更高但响应稍慢")
         return True
-    
+
     elif cmd_lower in ["关闭思考", "禁用思考", "2", "0", "off", "disable"]:
         print("\n❌ 思考模式已关闭")
         print("⚡ 模型将快速回答，适合简单问题")
         return False
-    
+
     elif cmd_lower in ["查看", "状态", "3", "status"]:
         print(f"\n📊 当前思考模式状态：{'✅ 已启用' if current_thinking_state else '❌ 未启用'}")
         if current_thinking_state:
@@ -870,24 +892,71 @@ def handle_thinking_command(cmd: str, current_thinking_state: bool) -> bool:
         print("请输入：启用/关闭思考，或输入'help'查看帮助")
         return current_thinking_state
 
+# ==================== 流式模式交互 ====================
+def show_stream_menu():
+    """显示流式输出模式菜单"""
+    print("\n" + "=" * 60)
+    print("📡 流式输出模式设置")
+    print("=" * 60)
+    print("1. ✅ 启用流式输出（实时显示，逐字呈现）")
+    print("2. ❌ 关闭流式输出（等待完整回复后显示）")
+    print("3. 📊 查看当前配置")
+    print("4. 🔙 返回主对话")
+    print("=" * 60)
+
+def handle_stream_command(cmd: str, current_stream_state: bool) -> bool:
+    """处理流式输出模式相关命令"""
+    cmd_lower = cmd.lower().strip()
+
+    if cmd_lower in ["启用流式", "开启流式", "1", "on", "enable"]:
+        print("\n✅ 流式输出已启用")
+        print("📡 AI回复将实时显示，用户体验更好")
+        return True
+
+    elif cmd_lower in ["关闭流式", "禁用流式", "2", "0", "off", "disable"]:
+        print("\n❌ 流式输出已关闭")
+        print("⏳ AI回复将等待完整内容后一次性显示")
+        return False
+
+    elif cmd_lower in ["查看", "状态", "3", "status"]:
+        print(f"\n📊 当前流式输出状态：{'✅ 已启用' if current_stream_state else '❌ 未启用'}")
+        if current_stream_state:
+            print("🎯 实时显示AI回复内容")
+            print("⚡ 响应速度更快，用户体验更好")
+        else:
+            print("🎯 等待完整回复后一次性显示")
+            print("📋 适合需要完整内容的场景")
+        return current_stream_state
+
+    elif cmd_lower in ["返回", "back", "4", "exit"]:
+        print("\n🔙 返回主对话")
+        return current_stream_state  # 保持当前状态，直接返回
+
+    else:
+        print(f"\n⚠️  未知命令：{cmd}")
+        print("请输入：启用/关闭流式，或输入'help'查看帮助")
+        return current_stream_state
+
 # ==================== 对话函数（增强版：流式输出 + 完整历史）====================
-def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_history, 
-                         show_details: bool = True, thinking_enabled: bool = False, 
+def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_history,
+                         show_details: bool = True, thinking_enabled: bool = False,
+                         stream_enabled: bool = True,
                          logger=None, system_prompt=None):
     """
     使用 MCP 工具查询天气 - 增强版
-    
+
     新增功能：
-    - 流式输出
+    - 流式输出（可开关）
     - 传递完整对话历史
     - 支持角色系统
-    
+
     Args:
         question: 用户问题
         client: MCP 客户端实例
         conversation_history: 对话历史列表（会被修改）
         show_details: 是否显示详细信息
         thinking_enabled: 是否启用思考模式
+        stream_enabled: 是否启用流式输出
         logger: AgentLogger 实例
         system_prompt: 系统提示词（角色定义）
     """
@@ -1063,15 +1132,18 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
 
             # 第二轮：让 AI 根据工具数据生成回复（流式输出）
             extra_body_2 = {
-                "mcp": mcp_cfg,
-                "incremental_output": True  # ✅ 启用增量输出
+                "mcp": mcp_cfg
             }
+
+            # 根据stream_enabled决定是否启用增量输出
+            if stream_enabled:
+                extra_body_2["incremental_output"] = True  # ✅ 启用增量输出
 
             if thinking_enabled:
                 # ✅ 使用正确的阿里云API参数格式
                 extra_body_2["enable_thinking"] = True
                 extra_body_2["thinking_budget"] = thinking_config.get("budget", 1000)
-            
+
             # 记录第二轮请求
             if logger:
                 logger.log_request({
@@ -1079,77 +1151,102 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
                     "messages_count": len(messages_2),
                     "tool_result_provided": True,
                     "thinking_mode": thinking_enabled,
+                    "stream_mode": stream_enabled,
                     "timestamp": datetime.now().isoformat()
                 })
             
             if show_details:
                 print(f"\n🤖 AI 正在生成回复...")
-            
+                if stream_enabled:
+                    print("📡 流式输出模式：✅ 已启用")
+                else:
+                    print("📡 流式输出模式：❌ 未启用（等待完整回复）")
+
             start_time_2 = time.time()
-            
-            # ✅ 使用流式输出
-            resp2 = Generation.call(
-                model=config['api']['model'],
-                messages=messages_2,
-                extra_body=extra_body_2,
-                stream=True,  # ✅ 启用流式输出
-                result_format="message"
-            )
-            
-            # 收集完整回复并实时显示
-            full_response = ""
-            previous_length = 0  # 记录之前打印的长度
-            print("🤖 AI: ", end="", flush=True)
 
-            # Dashscope 流式输出处理
-            full_reasoning = ""  # 存储完整的思考内容
+            # ✅ 使用流式输出（根据参数决定）
+            if stream_enabled:
+                # 流式输出模式
+                resp2 = Generation.call(
+                    model=config['api']['model'],
+                    messages=messages_2,
+                    extra_body=extra_body_2,
+                    stream=True,  # ✅ 启用流式输出
+                    result_format="message"
+                )
 
-            for chunk in resp2:
-                try:
-                    # Dashscope 流式格式: chunk.output.choices[0].message.content
-                    if hasattr(chunk, 'output') and chunk.output:
-                        if hasattr(chunk.output, 'choices') and chunk.output.choices:
-                            message = chunk.output.choices[0].message
+                # 收集完整回复并实时显示
+                full_response = ""
+                previous_length = 0  # 记录之前打印的长度
+                print("🤖 AI: ", end="", flush=True)
+            else:
+                # 非流式输出模式（等待完整回复）
+                resp2 = Generation.call(
+                    model=config['api']['model'],
+                    messages=messages_2,
+                    extra_body=extra_body_2,
+                    stream=False,  # ✅ 禁用流式输出
+                    result_format="message"
+                )
 
-                            # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
-                            try:
-                                reasoning_content = message.reasoning_content
-                                if reasoning_content:
-                                    # 记录思考内容到日志
-                                    if logger:
-                                        # 记录新增的思考内容
-                                        new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
-                                        if new_reasoning:
-                                            logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
-                                    full_reasoning = reasoning_content
-                            except (KeyError, AttributeError):
-                                # reasoning_content不存在或无法访问，跳过
-                                pass
+                # 直接获取完整回复
+                if hasattr(resp2, 'output') and resp2.output and hasattr(resp2.output, 'choices') and resp2.output.choices:
+                    full_response = resp2.output.choices[0].message.content
+                    print(f"🤖 AI: {full_response}")
+                else:
+                    full_response = ""
+                    print("❌ 无法获取回复")
 
-                            # 处理响应内容
-                            try:
-                                content = message.content
-                                if content:
-                                    # ✅ 直接使用完整content（流式输出每次都是累积的）
-                                    if len(content) > previous_length:
-                                        # 只打印新增的部分（增量）
-                                        new_content = content[previous_length:]
-                                        print(new_content, end="", flush=True)
-                                        previous_length = len(content)
+            # 流式输出处理（仅当stream_enabled为True时执行）
+            if stream_enabled:
+                full_reasoning = ""  # 存储完整的思考内容
 
-                                    # ✅ 始终更新full_response为最新的完整content
-                                    full_response = content
+                for chunk in resp2:
+                    try:
+                        # Dashscope 流式格式: chunk.output.choices[0].message.content
+                        if hasattr(chunk, 'output') and chunk.output:
+                            if hasattr(chunk.output, 'choices') and chunk.output.choices:
+                                message = chunk.output.choices[0].message
 
-                                    # ✅ 调试：记录content长度变化
-                                    if logger and len(content) % 50 == 0:  # 每50字符记录一次
-                                        logger.logger.debug(f"📝 Content长度: {len(content)} 字符")
-                            except (KeyError, AttributeError):
-                                # content不存在或无法访问，跳过
-                                pass
+                                # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
+                                try:
+                                    reasoning_content = message.reasoning_content
+                                    if reasoning_content:
+                                        # 记录思考内容到日志
+                                        if logger:
+                                            # 记录新增的思考内容
+                                            new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
+                                            if new_reasoning:
+                                                logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
+                                        full_reasoning = reasoning_content
+                                except (KeyError, AttributeError):
+                                    # reasoning_content不存在或无法访问，跳过
+                                    pass
 
-                except (AttributeError, IndexError) as e:
-                    # 跳过无法处理的chunk
-                    continue
+                                # 处理响应内容
+                                try:
+                                    content = message.content
+                                    if content:
+                                        # ✅ 直接使用完整content（流式输出每次都是累积的）
+                                        if len(content) > previous_length:
+                                            # 只打印新增的部分（增量）
+                                            new_content = content[previous_length:]
+                                            print(new_content, end="", flush=True)
+                                            previous_length = len(content)
+
+                                        # ✅ 始终更新full_response为最新的完整content
+                                        full_response = content
+
+                                        # ✅ 调试：记录content长度变化
+                                        if logger and len(content) % 50 == 0:  # 每50字符记录一次
+                                            logger.logger.debug(f"📝 Content长度: {len(content)} 字符")
+                                except (KeyError, AttributeError):
+                                    # content不存在或无法访问，跳过
+                                    pass
+
+                    except (AttributeError, IndexError) as e:
+                        # 跳过无法处理的chunk
+                        continue
 
             # ✅ 如果有思考内容,记录完整的思考过程
             if full_reasoning and logger:
@@ -1188,76 +1285,110 @@ def ask_weather_with_mcp(question: str, client: AmapMCPClient, conversation_hist
             return full_response
         
         else:
-            # 没有工具调用，直接回复（流式输出）
+            # 没有工具调用，直接回复
             extra_body_direct = {
-                "mcp": mcp_cfg,
-                "incremental_output": True  # ✅ 启用增量输出
+                "mcp": mcp_cfg
             }
+
+            # 根据stream_enabled决定是否启用增量输出
+            if stream_enabled:
+                extra_body_direct["incremental_output"] = True  # ✅ 启用增量输出
 
             if thinking_enabled:
                 # ✅ 使用正确的阿里云API参数格式
                 extra_body_direct["enable_thinking"] = True
                 extra_body_direct["thinking_budget"] = thinking_config.get("budget", 1000)
-            
+
             if show_details:
                 print(f"💬 AI 直接回复（未调用工具）")
-            
+                if stream_enabled:
+                    print("📡 流式输出模式：✅ 已启用")
+                else:
+                    print("📡 流式输出模式：❌ 未启用（等待完整回复）")
+
             # 重新调用以支持思考模式和流式输出
-            resp_direct = Generation.call(
-                model=config['api']['model'],
-                messages=conversation_history,  # ✅ 传递完整历史
-                extra_body=extra_body_direct,
-                tools=tools,
-                stream=True,  # ✅ 启用流式输出
-                result_format="message"
-            )
-            
-            # 收集完整回复并实时显示
-            direct_reply = ""
-            previous_length = 0  # 记录之前打印的长度
-            print("🤖 AI: ", end="", flush=True)
+            if stream_enabled:
+                # 流式输出模式
+                resp_direct = Generation.call(
+                    model=config['api']['model'],
+                    messages=conversation_history,  # ✅ 传递完整历史
+                    extra_body=extra_body_direct,
+                    tools=tools,
+                    stream=True,  # ✅ 启用流式输出
+                    result_format="message"
+                )
 
-            # Dashscope 流式输出处理
-            full_reasoning = ""  # 存储完整的思考内容
+                # 收集完整回复并实时显示
+                direct_reply = ""
+                previous_length = 0  # 记录之前打印的长度
+                print("🤖 AI: ", end="", flush=True)
+            else:
+                # 非流式输出模式
+                resp_direct = Generation.call(
+                    model=config['api']['model'],
+                    messages=conversation_history,  # ✅ 传递完整历史
+                    extra_body=extra_body_direct,
+                    tools=tools,
+                    stream=False,  # ✅ 禁用流式输出
+                    result_format="message"
+                )
 
-            for chunk in resp_direct:
-                try:
-                    # Dashscope 流式格式: chunk.output.choices[0].message.content
-                    if hasattr(chunk, 'output') and chunk.output:
-                        if hasattr(chunk.output, 'choices') and chunk.output.choices:
-                            message = chunk.output.choices[0].message
+                # 直接获取完整回复
+                if hasattr(resp_direct, 'output') and resp_direct.output and hasattr(resp_direct.output, 'choices') and resp_direct.output.choices:
+                    direct_reply = resp_direct.output.choices[0].message.content
+                    print(f"🤖 AI: {direct_reply}")
+                else:
+                    direct_reply = ""
+                    print("❌ 无法获取回复")
 
-                            # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
-                            try:
-                                reasoning_content = message.reasoning_content
-                                if reasoning_content:
-                                    # 记录思考内容到日志
-                                    if logger:
-                                        # 记录新增的思考内容
-                                        new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
-                                        if new_reasoning:
-                                            logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
-                                    full_reasoning = reasoning_content
-                            except (KeyError, AttributeError):
-                                # reasoning_content不存在或无法访问，跳过
-                                pass
+            # 流式输出处理（仅当stream_enabled为True时执行）
+            if stream_enabled:
+                full_reasoning = ""  # 存储完整的思考内容
 
-                            # 处理响应内容
-                            try:
-                                content = message.content
-                                if content and len(content) > previous_length:
-                                    # ✅ 只打印新增的部分（增量）
-                                    new_content = content[previous_length:]
-                                    print(new_content, end="", flush=True)
-                                    previous_length = len(content)
-                                    direct_reply = content  # 保存完整内容
-                            except (KeyError, AttributeError):
-                                # content不存在或无法访问，跳过
-                                pass
+                for chunk in resp_direct:
+                    try:
+                        # Dashscope 流式格式: chunk.output.choices[0].message.content
+                        if hasattr(chunk, 'output') and chunk.output:
+                            if hasattr(chunk.output, 'choices') and chunk.output.choices:
+                                message = chunk.output.choices[0].message
 
-                except (AttributeError, IndexError) as e:
-                    # 跳过无法处理的chunk
-                    continue
+                                # ✅ 处理思考内容 (reasoning_content) - 使用try-except避免KeyError
+                                try:
+                                    reasoning_content = message.reasoning_content
+                                    if reasoning_content:
+                                        # 记录思考内容到日志
+                                        if logger:
+                                            # 记录新增的思考内容
+                                            new_reasoning = reasoning_content[len(full_reasoning):] if len(reasoning_content) > len(full_reasoning) else ""
+                                            if new_reasoning:
+                                                logger.log_thinking_process(new_reasoning, budget_used=thinking_config.get('budget', 1000))
+                                        full_reasoning = reasoning_content
+                                except (KeyError, AttributeError):
+                                    # reasoning_content不存在或无法访问，跳过
+                                    pass
+
+                                # 处理响应内容
+                                try:
+                                    content = message.content
+                                    if content and len(content) > previous_length:
+                                        # ✅ 只打印新增的部分（增量）
+                                        new_content = content[previous_length:]
+                                        print(new_content, end="", flush=True)
+                                        previous_length = len(content)
+                                        direct_reply = content  # 保存完整内容
+                                except (KeyError, AttributeError):
+                                    # content不存在或无法访问，跳过
+                                    pass
+
+                    except (AttributeError, IndexError) as e:
+                        # 跳过无法处理的chunk
+                        continue
+
+                # ✅ 如果有思考内容,记录完整的思考过程
+                if full_reasoning and logger:
+                    logger.logger.info(f"🧠 完整思考过程长度: {len(full_reasoning)} 字符")
+
+                print()  # 完成后换行
 
             # ✅ 如果有思考内容,记录完整的思考过程
             if full_reasoning and logger:
@@ -1309,7 +1440,9 @@ if __name__ == "__main__":
                        help='思考token预算（默认：1000）')
     parser.add_argument('--log-dir', type=str, default='logs',
                        help='日志存储目录（默认：logs）')
-    
+    parser.add_argument('--stream-mode', type=str, choices=['on', 'off'],
+                       help='启用或关闭流式输出（on/off）')
+
     try:
         args = parser.parse_args()
     except:
@@ -1322,6 +1455,13 @@ if __name__ == "__main__":
             thinking_config["budget"] = args.thinking_budget
         else:
             thinking_config["enabled"] = False
+
+    # 根据命令行参数设置流式输出模式
+    if args and args.stream_mode:
+        if args.stream_mode == 'on':
+            stream_config["enabled"] = True
+        else:
+            stream_config["enabled"] = False
     
     # 初始化日志记录器
     log_dir = args.log_dir if args else 'logs'
@@ -1332,6 +1472,7 @@ if __name__ == "__main__":
         "version": "3.0-enhanced",
         "thinking_mode": thinking_config["enabled"],
         "thinking_budget": thinking_config["budget"],
+        "stream_mode": stream_config["enabled"],
         "log_dir": log_dir
     })
     
@@ -1339,20 +1480,28 @@ if __name__ == "__main__":
     print("=" * 60)
     print("🌤️ 高德地图天气查询系统（增强版）")
     print("=" * 60)
-    
+
     thinking_status = "🧠 思考模式：" + ("✅ 已启用" if thinking_config["enabled"] else "❌ 未启用")
     print(f"   {thinking_status}")
-    
+
     if thinking_config["enabled"]:
         print(f"   💡 思考预算：{thinking_config['budget']} tokens")
         print("   🎯 适用场景：复杂推理、深度分析")
     else:
         print("   ⚡ 快速回答模式")
         print("   🎯 适用场景：简单查询、快速问答")
-    
+
+    stream_status = "📡 流式输出：" + ("✅ 已启用" if stream_config["enabled"] else "❌ 未启用")
+    print(f"   {stream_status}")
+
+    if stream_config["enabled"]:
+        print("   🎯 实时显示AI回复内容")
+    else:
+        print("   🎯 等待完整回复后一次性显示")
+
     print(f"   📋 日志目录：{log_dir}")
     print("   🎭 角色系统：天气预报员、程序员、妈妈")
-    
+
     print("=" * 60)
     
     # 初始化 MCP 客户端
@@ -1368,13 +1517,15 @@ if __name__ == "__main__":
         print("💡 新增功能：")
         print("  - 输入'/role'可选择角色（天气预报员、程序员、妈妈）")
         print("  - 输入'/thinking'可切换思考模式")
+        print("  - 输入'/stream'可切换流式输出模式")
         print("  - 输入'/clear'清空对话历史（支持 /clear N 和 /clear -N）")
         print("  - 输入'/help'查看帮助信息")
         print("  - 支持流式输出和完整多轮对话记忆")
         print("  - 完整日志记录功能已启用")
-        
+
         # 初始化对话状态
         thinking_enabled = thinking_config["enabled"]
+        stream_enabled = stream_config["enabled"]
         conversation_history = []
         current_system_prompt = ROLES["3"]["content"]  # 默认：妈妈角色
         
@@ -1423,14 +1574,27 @@ if __name__ == "__main__":
                 show_thinking_menu()
                 thinking_cmd = input("请选择操作（1-4）: ").strip()
                 thinking_enabled = handle_thinking_command(thinking_cmd, thinking_enabled)
-                
+
                 # 记录配置变更
                 agent_logger.log_system_event("thinking_mode_changed", {
                     "new_state": thinking_enabled
                 })
-                
+
                 continue
-            
+
+            # 流式模式相关命令
+            elif question.lower() in ['stream', '/stream', '流式', '流式输出']:
+                show_stream_menu()
+                stream_cmd = input("请选择操作（1-4）: ").strip()
+                stream_enabled = handle_stream_command(stream_cmd, stream_enabled)
+
+                # 记录配置变更
+                agent_logger.log_system_event("stream_mode_changed", {
+                    "new_state": stream_enabled
+                })
+
+                continue
+
             # 清空对话命令（支持参数）
             elif question.lower().startswith('clear') or question.lower().startswith('/clear'):
                 clear_history(conversation_history, current_system_prompt, question)
@@ -1444,11 +1608,12 @@ if __name__ == "__main__":
             
             # 调用对话函数
             ask_weather_with_mcp(
-                question, 
-                client, 
+                question,
+                client,
                 conversation_history,
-                show_details=True, 
-                thinking_enabled=thinking_enabled, 
+                show_details=True,
+                thinking_enabled=thinking_enabled,
+                stream_enabled=stream_enabled,
                 logger=agent_logger,
                 system_prompt=current_system_prompt
             )
@@ -1478,8 +1643,10 @@ if __name__ == "__main__":
         client.close()
         print("\n✅ MCP 服务器已关闭")
         print(f"🧠 最终思考模式状态：{'✅ 已启用' if thinking_enabled else '❌ 未启用'}")
-        
+        print(f"📡 最终流式输出状态：{'✅ 已启用' if stream_enabled else '❌ 未启用'}")
+
         # 记录系统关闭
         agent_logger.log_system_event("agent_shutdown", {
-            "final_thinking_state": thinking_enabled
+            "final_thinking_state": thinking_enabled,
+            "final_stream_state": stream_enabled
         })
